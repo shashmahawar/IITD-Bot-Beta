@@ -2,6 +2,34 @@ import csv, datetime, json, requests
 from bs4 import BeautifulSoup
 
 # Global Variables
+kerberos = {}
+branches = []
+hostels = []
+years = ['2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022']
+
+def reload():
+    global kerberos
+    kerberos = {}
+    with open("datafiles/kerberos.csv", "r") as f:
+        reader = csv.reader(f, delimiter=',')
+        for row in reader:
+            kerberos[row[0]] = {"name": row[1], "hostel": row[2]}
+
+    global branches
+    branches = []
+    with open("datafiles/branches.csv", "r") as f:
+        reader = csv.reader(f, delimiter=',')
+        for row in reader:
+            branches.append(row[0])
+
+    global hostels
+    hostels = []
+    with open("datafiles/hostels.csv", "r") as f:
+        reader = csv.reader(f, delimiter=',')
+        for row in reader:
+            hostels.append(row[0])
+
+    
 
 async def fetch_ldap(msg):
 
@@ -43,3 +71,5 @@ async def fetch_ldap(msg):
         json.dump(courseLists, outfile)
 
     await msg.edit(content=f"Fetched LDAP!")
+
+reload()

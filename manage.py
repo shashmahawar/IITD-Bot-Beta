@@ -1,8 +1,8 @@
 import discord
 from discord.ext import commands
-import datetime, os
+import csv, datetime, os
 from dotenv import load_dotenv
-import utils
+import kerberos_management, utils
 
 intents = discord.Intents.all()
 client = commands.Bot(command_prefix='!', intents=intents, activity=discord.Activity(type=discord.ActivityType.listening, name="?help"), case_insensitive = True)
@@ -50,6 +50,8 @@ async def on_member_update(before, after):
     if before.guild.id == 871982588422656031:
         channel = client.get_channel(1025010614948606073)
         if len(before.roles) != len(after.roles):
+            async for entry in before.guild.audit_logs(limit=1,action=discord.AuditLogAction.member_role_update):
+                editor = entry.user
             embed = discord.Embed(
                 color=0x3480D5,
                 timestamp=datetime.datetime.now()
@@ -57,6 +59,8 @@ async def on_member_update(before, after):
             embed.set_author(name=f"{before.name}#{before.discriminator}", icon_url=before.avatar)
             embed.set_footer(text=f"ID: {before.id}")
             if len(before.roles) < len(after.roles):
+                if editor == client.user:
+                    return
                 new_role = next(role for role in after.roles if role not in before.roles)
                 embed.description = f"**{before.mention} was given the `{new_role.name}` role**"
             else:
@@ -114,6 +118,49 @@ async def on_message_edit(before, after):
 async def ping(ctx):
     await ctx.send('Pong!')
 
+# Kerberos Related Commands
+
+@client.command()
+async def set(ctx, kerberos):
+    if not ctx.guild:
+        guild = client.get_guild(871982588422656031)
+        await ctx.reply(f"Please set your kerberos in **{guild.name}** \nhttps://discord.gg/SaAKrjCCMq")
+        return
+    if ctx.guild.id == 871982588422656031:
+        if len(kerberos) == 11:
+            kerberos = kerberos[4:7] + kerberos[2:4] + kerberos[7:]
+            print(kerberos)
+        kerberos = kerberos.lower()
+        if kerberos in utils.kerberos:
+            msg = await ctx.reply("Setting your kerberos...")
+            await kerberos_management.set(ctx, kerberos, client, msg, ctx.message.author)
+        else:
+            await ctx.reply('The Kerberos ID you entered is invalid. Please try again.')
+    else:
+        guild = client.get_guild(871982588422656031)
+        await ctx.reply(f"Please set your kerberos in **{guild.name}** \nhttps://discord.gg/SaAKrjCCMq")
+
+@client.command()
+@commands.has_role(872326201132339210)
+async def edit(ctx, user: discord.Member, kerberos):
+    if not ctx.guild:
+        guild = client.get_guild(871982588422656031)
+        await ctx.reply(f"Please edit kerberos in **{guild.name}** \nhttps://discord.gg/SaAKrjCCMq")
+        return
+    if ctx.guild.id == 871982588422656031:
+        if len(kerberos) == 11:
+            kerberos = kerberos[4:7] + kerberos[2:4] + kerberos[7:]
+            print(kerberos)
+        kerberos = kerberos.lower()
+        if kerberos in utils.kerberos:
+            msg = await ctx.reply(f"Updating kerberos for {user.name}#{user.discriminator}")
+            await kerberos_management.set(ctx, kerberos, client, msg, user)
+        else:
+            await ctx.reply('The Kerberos ID you entered is invalid. Please try again.')
+    else:
+        guild = client.get_guild(871982588422656031)
+        await ctx.reply(f"Please edit kerberos in **{guild.name}** \nhttps://discord.gg/SaAKrjCCMq")
+
 # FETCHLDAP
 @client.command()
 async def fetchldap(ctx):
@@ -121,6 +168,6 @@ async def fetchldap(ctx):
     await utils.fetch_ldap(msg)
 
 
-
+utils.reload()
 load_dotenv()
 client.run(os.getenv('BOT_TOKEN'))
