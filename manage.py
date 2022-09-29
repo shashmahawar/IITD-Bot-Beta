@@ -16,13 +16,63 @@ async def on_member_join(member):
     if member.guild.id == 871982588422656031:
         channel = client.get_channel(871983126488948767)
         bot_commands = client.get_channel(872364635637035028)
-        await channel.send(f'Hey {member.mention}, welcome to **{member.guild.name}**! Please go to {bot_commands.mention} and use `?set <kerberos>` to get your roles!')
+        if not member.bot:
+            await channel.send(f'Hey {member.mention}, welcome to **{member.guild.name}**! Please go to {bot_commands.mention} and use `?set <kerberos>` to get your roles!')
+        channel = client.get_channel(1025010614948606073)
+        embed = discord.Embed(
+            description=f"{member.mention} {member.name}#{member.discriminator}",
+            color=0x42B582,
+            timestamp=datetime.datetime.now()
+        )
+        embed.set_author(name=f"Member Joined")
+        embed.set_footer(text=f"ID: {member.id}")
+        await channel.send(embed=embed)
+
 
 @client.event
 async def on_member_remove(member):
     if member.guild.id == 871982588422656031:
         channel = client.get_channel(871983126488948767)
-        await channel.send(f'**{member.name}#{member.discriminator}** just left the server')
+        if not member.bot:
+            await channel.send(f'**{member.name}#{member.discriminator}** just left the server')
+        channel = client.get_channel(1025010614948606073)
+        embed = discord.Embed(
+            description=f"{member.mention} {member.name}#{member.discriminator}",
+            color=0xFE4712,
+            timestamp=datetime.datetime.now()
+        )
+        embed.set_author(name=f"Member Left")
+        embed.set_footer(text=f"ID: {member.id}")
+        await channel.send(embed=embed)
+
+@client.event
+async def on_member_update(before, after):
+    if before.guild.id == 871982588422656031:
+        channel = client.get_channel(1025010614948606073)
+        if len(before.roles) != len(after.roles):
+            embed = discord.Embed(
+                color=0x3480D5,
+                timestamp=datetime.datetime.now()
+            )
+            embed.set_author(name=f"{before.name}#{before.discriminator}", icon_url=before.avatar)
+            embed.set_footer(text=f"ID: {before.id}")
+            if len(before.roles) < len(after.roles):
+                new_role = next(role for role in after.roles if role not in before.roles)
+                embed.description = f"**{before.mention} was given the `{new_role.name}` role**"
+            else:
+                old_role = next(role for role in before.roles if role not in after.roles)
+                embed.description = f"**{before.mention} was removed from the `{old_role.name}` role**"
+        elif before.nick != after.nick:
+            embed = discord.Embed(
+                description=f"**{before.mention} nickname changed**",
+                color=0x3480D5,
+                timestamp=datetime.datetime.now()
+            )
+            embed.add_field(name="Before", value=before.nick, inline=False)
+            embed.add_field(name="After", value=after.nick, inline=False)
+            embed.set_author(name=f"{before.name}#{before.discriminator}", icon_url=before.avatar)
+            embed.set_footer(text=f"ID: {before.id}")
+        await channel.send(embed=embed)
 
 @client.event
 async def on_message_delete(message):
@@ -39,7 +89,7 @@ async def on_message_delete(message):
             color=0xFE4712,
             timestamp=datetime.datetime.now()
         )
-        embed.set_author(name=f"{deleter.name}#{deleter.discriminator}", icon_url=deleter.avatar)
+        embed.set_author(name=f"{message.author.name}#{message.author.discriminator}", icon_url=message.author.avatar)
         embed.set_footer(text=f"Author: {message.author.id} | Message ID: {message.id}")
         await channel.send(embed=embed)
 
