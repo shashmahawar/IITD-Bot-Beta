@@ -5,6 +5,8 @@ from bs4 import BeautifulSoup
 kerberos = {}
 branches = []
 hostels = []
+course_slots = {}
+slots = []
 days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
 meals = ['breakfast', 'lunch', 'snacks', 'dinner']
 years = ['2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022']
@@ -30,8 +32,29 @@ def reload():
         reader = csv.reader(f, delimiter=',')
         for row in reader:
             hostels.append(row[0])
-
     
+    global course_slots
+    course_slots = {}
+    with open("datafiles/Courses_Offered.csv", "r") as f:
+        reader = csv.reader(f, delimiter=',')
+        for row in reader:
+            course_slots[row[1].split('-')[-1]] = row[3]
+    
+    global slots
+    slots = []
+    with open("datafiles/slot_timings.json", "r") as f:
+        slots = json.load(f)
+
+
+async def get_courses(kerberos):
+    with open("datafiles/course_lists.json", "r") as f:
+        course_lists = json.load(f)
+    courses = []
+    for course in course_lists:
+        if kerberos in course_lists[course]:
+            if course.startswith('2201'):
+                courses.append(course.split('-')[-1])
+    return courses
 
 async def fetch_ldap(msg):
 

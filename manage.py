@@ -1,11 +1,12 @@
 import discord
 from discord.ext import commands
-import datetime, json, os
+import asyncio, datetime, json, os, typing
 from dotenv import load_dotenv
-import mess_management, kerberos_management, utils
+import course_management, mess_management, kerberos_management, utils
 
 intents = discord.Intents.all()
 client = commands.Bot(command_prefix='!', intents=intents, activity=discord.Activity(type=discord.ActivityType.listening, name="?help"), case_insensitive = True)
+client.remove_command('help')
 
 @client.event
 async def on_ready():
@@ -114,10 +115,6 @@ async def on_message_edit(before, after):
         embed.set_footer(text=f"User ID: {before.author.id}")
         await channel.send(embed=embed)
 
-@client.command()
-async def ping(ctx):
-    await ctx.send('Pong!')
-
 # Kerberos Related Commands
 
 @client.command()
@@ -141,7 +138,7 @@ async def set(ctx, kerberos):
         await ctx.reply(f"Please set your kerberos in **{guild.name}** \nhttps://discord.gg/SaAKrjCCMq")
 
 @client.command()
-async def mess(ctx, *args):
+async def mess(ctx, *args: typing.Union[discord.Member, str]):
     discord_ids = json.load(open("datafiles/discord_ids.json", "r"))
     if str(ctx.message.author.id) not in discord_ids:
         await ctx.reply("Please set your kerberos using `?set <kerberos>` command before using this command!")
@@ -171,6 +168,31 @@ async def edit(ctx, user: discord.Member, kerberos):
         guild = client.get_guild(871982588422656031)
         await ctx.reply(f"Please edit kerberos in **{guild.name}** \nhttps://discord.gg/SaAKrjCCMq")
 
+# Course Related Commands
+
+@client.command(aliases=['tt'])
+async def timetable(ctx, *args: typing.Union[discord.Member, str]):
+    discord_ids = json.load(open("datafiles/discord_ids.json", "r"))
+    if str(ctx.message.author.id) not in discord_ids:
+        await ctx.reply("Please set your kerberos using `?set <kerberos>` command before using this command!")
+        return
+    await course_management.send_timetable(ctx, client, args)
+
+@client.command()
+async def courses(ctx, *args: typing.Union[discord.Member, str]):
+    discord_ids = json.load(open("datafiles/discord_ids.json", "r"))
+    if str(ctx.message.author.id) not in discord_ids:
+        await ctx.reply("Please set your kerberos using `?set <kerberos>` command before using this command!")
+        return
+    await course_management.send_courses(ctx, client, args)
+
+@client.command()
+async def slot(ctx, *args):
+    discord_ids = json.load(open("datafiles/discord_ids.json", "r"))
+    if str(ctx.message.author.id) not in discord_ids:
+        await ctx.reply("Please set your kerberos using `?set <kerberos>` command before using this command!")
+        return
+    await course_management.send_slots(ctx, client, args)
 
 
 # Mess Managers
@@ -231,12 +253,48 @@ async def updatetime(ctx, hostel, day, meal, *, time):
         guild = client.get_guild(871982588422656031)
         await ctx.reply(f"Please update mess menu in **{guild.name}** \nhttps://discord.gg/SaAKrjCCMq")
 
+# Fun Commands
+
+@client.command(aliases=['av'])
+async def avatar(ctx, user: discord.Member = None):
+    if not user:
+        user = ctx.author
+    embed = discord.Embed(title=f"Avatar", color=discord.Color.green(), timestamp=datetime.datetime.now())
+    embed.set_image(url=user.avatar)
+    embed.set_author(name=f"{user.name}#{user.discriminator}", icon_url=user.avatar)
+    embed.set_footer(text=f"Requested by {ctx.author.name}#{ctx.author.discriminator}")
+    await ctx.reply(embed=embed)
+
+
 # FETCHLDAP
 @client.command()
 async def fetchldap(ctx):
     msg = await ctx.reply('_Fetching LDAP Data:_ **0%**')
     await utils.fetch_ldap(msg)
 
+@client.command()
+async def ping(ctx):
+    await ctx.reply(f"`{round(client.latency * 1000)}ms`")
+
+@client.command()
+async def help(ctx):
+    embed = discord.Embed(title="IITD-Bot Help Menu", color=0x1ABC9C, timestamp=datetime.datetime.now())
+    embed.set_thumbnail(url=client.user.avatar)
+    embed.add_field(name="General Commands", value="`?help` - Shows this message\n`?ping` - Shows bot latency\n`?set <kerberos>` - Sets your kerberos for using other commands\n`?courses` - Shows all the courses you are enrolled in\n`?timetable` - Shows your timetable\n`?slot <course_code>` - Shows all the slots of the given course code\n`?mess` - Shows the mess menu for your hostel for the present day", inline=False)
+    embed.add_field(name="Manager Commands", value="`?updatemenu <hostel> <day> <meal> <menu>` - Updates the mess menu for the given hostel, day and meal\n`?updatetime <hostel> <day> <meal> <time>` - Updates the mess time for the given hostel, day and meal\n`?fetchldap` - Fetches course data from IITD Servers\n`?edit` - Set kerberos for another user", inline=False)
+    embed.add_field(name="Bot Details", value="Curious how this works? Check out the source code at https://github.com/as1605/IITD-Bot and leave a :star: if you like it!", inline=False)
+    embed.set_footer(text=f"Requested by: {ctx.author.name}#{ctx.author.discriminator}")
+    await ctx.reply(embed=embed)
+
+@client.command()
+@commands.has_any_role(872326201132339210, 872381019553153077, 872375255795114005)
+async def start(ctx):
+    if ctx.guild.id == 871982588422656031:
+        while True:
+            members = len(ctx.guild.members)
+            channel = client.get_channel(1025465969004523570)
+            await channel.edit(name=f"Members: {members}")
+            await asyncio.sleep(600)
 
 utils.reload()
 load_dotenv()
