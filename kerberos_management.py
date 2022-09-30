@@ -30,7 +30,7 @@ async def set(ctx, kerberos, client, msg, user):
         await msg.edit(content=f"Account was previously linked to `{last_kerberos}`")
 
     with open("datafiles/discord_ids.json", 'w') as f:
-        data[str(user.id)] = {'kerberos': kerberos, 'name': user_name, 'hostel': user_hostel}
+        data[str(user.id)] = {'kerberos': kerberos, 'name': user_name}
         json.dump(data, f)
 
     for role in user.roles:

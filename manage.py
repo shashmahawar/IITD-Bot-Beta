@@ -1,8 +1,8 @@
 import discord
 from discord.ext import commands
-import csv, datetime, os
+import datetime, json, os
 from dotenv import load_dotenv
-import kerberos_management, utils
+import mess_management, kerberos_management, utils
 
 intents = discord.Intents.all()
 client = commands.Bot(command_prefix='!', intents=intents, activity=discord.Activity(type=discord.ActivityType.listening, name="?help"), case_insensitive = True)
@@ -141,6 +141,16 @@ async def set(ctx, kerberos):
         await ctx.reply(f"Please set your kerberos in **{guild.name}** \nhttps://discord.gg/SaAKrjCCMq")
 
 @client.command()
+async def mess(ctx, *args):
+    discord_ids = json.load(open("datafiles/discord_ids.json", "r"))
+    if str(ctx.message.author.id) not in discord_ids:
+        await ctx.reply("Please set your kerberos using `?set <kerberos>` command before using this command!")
+        return
+    await mess_management.send_menu(ctx, client, args)
+
+
+
+@client.command()
 @commands.has_role(872326201132339210)
 async def edit(ctx, user: discord.Member, kerberos):
     if not ctx.guild:
@@ -160,6 +170,66 @@ async def edit(ctx, user: discord.Member, kerberos):
     else:
         guild = client.get_guild(871982588422656031)
         await ctx.reply(f"Please edit kerberos in **{guild.name}** \nhttps://discord.gg/SaAKrjCCMq")
+
+
+
+# Mess Managers
+
+@client.command()
+@commands.has_any_role(872326201132339210, 872381019553153077, 1025315061427867738)
+async def updatemenu(ctx, hostel, day, meal, *, menu):
+    if not ctx.guild:
+        guild = client.get_guild(871982588422656031)
+        await ctx.reply(f"Please update mess menu in **{guild.name}** \nhttps://discord.gg/SaAKrjCCMq")
+        return
+    if ctx.guild.id == 871982588422656031:
+        if hostel.title() in utils.hostels:
+            hostel_role = discord.utils.get(ctx.guild.roles, name=hostel.title())
+            manager_role = discord.utils.get(ctx.guild.roles, id=872326201132339210)
+            admin_role = discord.utils.get(ctx.guild.roles, id=872381019553153077)
+            if hostel_role not in ctx.author.roles and manager_role not in ctx.author.roles and admin_role not in ctx.author.roles:
+                await ctx.reply("You don't belong to this hostel.")
+                return
+            if day[:3].lower() in utils.days:
+                if meal.lower() in utils.meals:
+                    await mess_management.update_menu(ctx, client, hostel.title(), day[:3].title(), meal.title(), menu)
+                else:
+                    await ctx.reply(f"Invalid meal. Please enter one of the following: **{', '.join(utils.meals)}**")
+            else:
+                await ctx.reply(f"Invalid day. Please enter one of the following: **{', '.join(utils.days)}**")
+        else:
+            await ctx.reply(f"Invalid hostel")
+    else:
+        guild = client.get_guild(871982588422656031)
+        await ctx.reply(f"Please update mess menu in **{guild.name}** \nhttps://discord.gg/SaAKrjCCMq")
+
+@client.command()
+@commands.has_any_role(872326201132339210, 872381019553153077, 1025315061427867738)
+async def updatetime(ctx, hostel, day, meal, *, time):
+    if not ctx.guild:
+        guild = client.get_guild(871982588422656031)
+        await ctx.reply(f"Please update mess menu in **{guild.name}** \nhttps://discord.gg/SaAKrjCCMq")
+        return
+    if ctx.guild.id == 871982588422656031:
+        if hostel.title() in utils.hostels:
+            hostel_role = discord.utils.get(ctx.guild.roles, name=hostel.title())
+            manager_role = discord.utils.get(ctx.guild.roles, id=872326201132339210)
+            admin_role = discord.utils.get(ctx.guild.roles, id=872381019553153077)
+            if hostel_role not in ctx.author.roles and manager_role not in ctx.author.roles and admin_role not in ctx.author.roles:
+                await ctx.reply("You don't belong to this hostel.")
+                return
+            if day[:3].lower() in utils.days:
+                if meal.lower() in utils.meals:
+                    await mess_management.update_time(ctx, client, hostel.title(), day[:3].title(), meal.title(), time)
+                else:
+                    await ctx.reply(f"Invalid meal. Please enter one of the following: **{', '.join(utils.meals)}**")
+            else:
+                await ctx.reply(f"Invalid day. Please enter one of the following: **{', '.join(utils.days)}**")
+        else:
+            await ctx.reply(f"Invalid hostel")
+    else:
+        guild = client.get_guild(871982588422656031)
+        await ctx.reply(f"Please update mess menu in **{guild.name}** \nhttps://discord.gg/SaAKrjCCMq")
 
 # FETCHLDAP
 @client.command()
