@@ -145,8 +145,6 @@ async def mess(ctx, *args: typing.Union[discord.Member, str]):
         return
     await mess_management.send_menu(ctx, client, args)
 
-
-
 @client.command()
 @commands.has_role(872326201132339210)
 async def edit(ctx, user: discord.Member, kerberos):
@@ -167,6 +165,14 @@ async def edit(ctx, user: discord.Member, kerberos):
     else:
         guild = client.get_guild(871982588422656031)
         await ctx.reply(f"Please edit kerberos in **{guild.name}** \nhttps://discord.gg/SaAKrjCCMq")
+
+@client.command()
+@commands.has_any_role(872326201132339210, 872381019553153077)
+async def update(ctx):
+    fname = f"logs/log-{datetime.datetime.now().isoformat()}.txt"
+    await kerberos_management.update(ctx, client, open(fname, "w"))
+    log_channel = client.get_channel(1025769912645451908)
+    await log_channel.send(file=discord.File(fname), content=ctx.author.mention)
 
 # Course Related Commands
 
