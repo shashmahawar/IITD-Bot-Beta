@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 import asyncio, datetime, json, os, typing
 from dotenv import load_dotenv
-import course_management, mess_management, kerberos_management, utils
+import course_management, mess_management, moderation, kerberos_management, utils
 
 intents = discord.Intents.all()
 client = commands.Bot(command_prefix='!', intents=intents, activity=discord.Activity(type=discord.ActivityType.listening, name="?help"), case_insensitive = True)
@@ -287,7 +287,7 @@ async def help(ctx):
     embed = discord.Embed(title="IITD-Bot Help Menu", color=0x1ABC9C, timestamp=datetime.datetime.now())
     embed.set_thumbnail(url=client.user.avatar)
     embed.add_field(name="General Commands", value="`?help` - Shows this message\n`?ping` - Shows bot latency\n`?set <kerberos>` - Sets your kerberos for using other commands\n`?courses` - Shows all the courses you are enrolled in\n`?timetable` - Shows your timetable\n`?slot <course_code>` - Shows all the slots of the given course code\n`?mess` - Shows the mess menu for your hostel for the present day", inline=False)
-    embed.add_field(name="Manager Commands", value="`?updatemenu <hostel> <day> <meal> <menu>` - Updates the mess menu for the given hostel, day and meal\n`?updatetime <hostel> <day> <meal> <time>` - Updates the mess time for the given hostel, day and meal\n`?fetchldap` - Fetches course data from IITD Servers\n`?edit` - Set kerberos for another user", inline=False)
+    embed.add_field(name="Manager Commands", value="`?updatemenu <hostel> <day> <meal> <menu>` - Updates the mess menu for the given hostel, day and meal\n`?updatetime <hostel> <day> <meal> <time>` - Updates the mess time for the given hostel, day and meal\n`?fetchldap` - Fetches course data from IITD Servers\n`?edit` - Set kerberos for another user\n`?purge <amount>` - Delete specified number of messages from a channel.\n`?update` - Updates the roles and names for everyone in the server.", inline=False)
     embed.add_field(name="Bot Details", value="Curious how this works? Check out the source code at https://github.com/as1605/IITD-Bot and leave a :star: if you like it!", inline=False)
     embed.set_footer(text=f"Requested by: {ctx.author.name}#{ctx.author.discriminator}")
     await ctx.reply(embed=embed)
@@ -301,6 +301,11 @@ async def start(ctx):
             channel = client.get_channel(1025465969004523570)
             await channel.edit(name=f"Members: {members}")
             await asyncio.sleep(600)
+
+@client.command()
+@commands.has_any_role(872326201132339210, 872381019553153077, 872375255795114005)
+async def purge(ctx, amount=100):
+    await moderation.purge(ctx, client, amount)
 
 utils.reload()
 load_dotenv()

@@ -167,5 +167,5 @@ async def update(ctx, client, log):
                     log.write(f"WARNING: ROLE not found `{branch}`"+'\n')
         else:
             log.write(f"WARNING: Could not find `{kerberos}` in kerberos database"+'\n')
-            await channel.send(f"Kerberos linked with {user.mention}, i.e. {kerberos} could not be found in the kerberos database.")
+            await channel.send(f"Kerberos linked with {user.mention}, i.e. `{kerberos}` could not be found in the kerberos database.")
         log.flush()
