@@ -67,6 +67,7 @@ async def on_member_update(before, after):
             else:
                 old_role = next(role for role in before.roles if role not in after.roles)
                 embed.description = f"**{before.mention} was removed from the `{old_role.name}` role**"
+            await channel.send(embed=embed)
         elif before.nick != after.nick:
             embed = discord.Embed(
                 description=f"**{before.mention} nickname changed**",
@@ -77,7 +78,7 @@ async def on_member_update(before, after):
             embed.add_field(name="After", value=after.nick, inline=False)
             embed.set_author(name=f"{before.name}#{before.discriminator}", icon_url=before.avatar)
             embed.set_footer(text=f"ID: {before.id}")
-        await channel.send(embed=embed)
+            await channel.send(embed=embed)
 
 @client.event
 async def on_message_delete(message):
@@ -298,8 +299,11 @@ async def start(ctx):
     if ctx.guild.id == 871982588422656031:
         while True:
             members = len(ctx.guild.members)
-            channel = client.get_channel(1025465969004523570)
-            await channel.edit(name=f"Members: {members}")
+            online = sum(member.status!=discord.Status.offline and not member.bot for member in ctx.guild.members)
+            members_channel = client.get_channel(1025465969004523570)
+            online_channel = client.get_channel(1025793822405427251)
+            await members_channel.edit(name=f"Members: {members}")
+            await online_channel.edit(name=f"Online Now: {online}")
             await asyncio.sleep(600)
 
 @client.command()

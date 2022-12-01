@@ -4,3 +4,4 @@ env
 .env
 datafiles
 logs
+olddata/
