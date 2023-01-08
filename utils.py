@@ -79,7 +79,7 @@ async def get_courses(kerberos):
     courses = []
     for course in course_lists:
         if kerberos in course_lists[course]:
-            if course.startswith('2201'):
+            if course.startswith('2202'):
                 courses.append(course.split('-')[-1])
     return courses
 
