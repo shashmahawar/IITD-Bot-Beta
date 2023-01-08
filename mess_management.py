@@ -25,7 +25,7 @@ async def send_menu(ctx, client, args):
                     if arg[1:4].lower() == d.lower():
                         days.append(d.title())
     if len(days) == 0:
-        days.append(calendar.day_abbr[datetime.datetime.now().weekday()])
+        days.append(calendar.day_abbr[datetime.datetime.utcnow().weekday()])
     if len(hostels) == 0:
         kerberos = json.load(open("datafiles/discord_ids.json"))[str(ctx.message.author.id)]["kerberos"]
         hostel = utils.kerberos[kerberos]["hostel"]
@@ -64,11 +64,11 @@ async def update_menu(ctx, client, hostel, day, meal, menu):
     embed = discord.Embed(
         description=f"**{meal} menu for {hostel} hostel was updated by {ctx.message.author.mention}**",
         color=0x3480D5,
-        timestamp=datetime.datetime.now()
+        timestamp=datetime.datetime.utcnow()
     )
     embed.add_field(name="Previous Menu", value=last_menu, inline=False)
     embed.add_field(name="New Menu", value=menu, inline=False)
-    embed.set_author(name=f"{ctx.message.author.name}#{ctx.message.author.discriminator}", icon_url=ctx.message.author.avatar)
+    embed.set_author(name=f"{ctx.message.author.name}#{ctx.message.author.discriminator}", icon_url=ctx.message.author.avatar_url)
     embed.set_footer(text=f"ID: {ctx.message.author.id}")
     await mess_channel.send(embed=embed)
 
@@ -84,10 +84,10 @@ async def update_time(ctx, client, hostel, day, meal, time):
     embed = discord.Embed(
         description=f"**{meal} timing for {hostel} hostel was updated by {ctx.message.author.mention}**",
         color=0x3480D5,
-        timestamp=datetime.datetime.now()
+        timestamp=datetime.datetime.utcnow()
     )
     embed.add_field(name="Previous Timing", value=last_time, inline=False)
     embed.add_field(name="New Timing", value=time, inline=False)
-    embed.set_author(name=f"{ctx.message.author.name}#{ctx.message.author.discriminator}", icon_url=ctx.message.author.avatar)
+    embed.set_author(name=f"{ctx.message.author.name}#{ctx.message.author.discriminator}", icon_url=ctx.message.author.avatar_url)
     embed.set_footer(text=f"ID: {ctx.message.author.id}")
     await mess_channel.send(embed=embed)

@@ -29,7 +29,7 @@ async def send_timetable(ctx, client, args):
                 slot_details = utils.slots[slot]
                 for day in slot_details:
                     timetable[day].append(f"{course}: {slot_details[day]}")
-        embed = discord.Embed(title=f"Timetable for {user}", color=0x3480D5, timestamp=datetime.datetime.now())
+        embed = discord.Embed(title=f"Timetable for {user}", color=0x3480D5, timestamp=datetime.datetime.utcnow())
         for day in timetable:
             embed.add_field(name=day, value="```"+ "\n".join(timetable[day]) + "```", inline=False)
         embed.set_footer(text=f"Requested by: {ctx.author.name}#{ctx.author.discriminator}")
@@ -62,7 +62,7 @@ async def send_courses(ctx, client, args):
         reply = ""
         for course in courses:
             reply += f"`{course}` "
-        embed = discord.Embed(title=f"Courses for {user}", description=reply,color=0x3480D5, timestamp=datetime.datetime.now())
+        embed = discord.Embed(title=f"Courses for {user}", description=reply,color=0x3480D5, timestamp=datetime.datetime.utcnow())
         embed.set_footer(text=f"Requested by: {ctx.author.name}#{ctx.author.discriminator}")
         if ctr == 0:
             await ctx.reply(embed=embed)
@@ -71,9 +71,30 @@ async def send_courses(ctx, client, args):
             await ctx.send(embed=embed)
 
 async def send_slots(ctx, client, args):
-    embed = discord.Embed(title=f"Course Slots", color=0x3480D5, timestamp=datetime.datetime.now())
+    embed = discord.Embed(title=f"Course Slots", color=0x3480D5, timestamp=datetime.datetime.utcnow())
     for arg in args:
         if arg.upper() in utils.course_slots:
             embed.add_field(name=arg.upper(), value=f"`{utils.course_slots[arg.upper()]}`")
     embed.set_footer(text=f"Requested by: {ctx.author.name}#{ctx.author.discriminator}")
     await ctx.reply(embed=embed)
+
+async def send_info(ctx, client, args):
+    ctr = 0
+    for arg in args:
+        arg = arg.upper()
+        if arg in utils.courseinfo:
+            info = utils.course_info(arg)
+            if not info:
+                continue
+            embed = discord.Embed(title = f"{info['code']} - {info['name']}", color=discord.Color.gold())
+            embed.add_field(name='Credits', value = f"`{info['credits']}`")
+            embed.add_field(name='Credit Structure', value = f"`{info['credit-structure']}`")
+            embed.add_field(name='Pre-requisites', value = f"`{info['pre-requisites']}`")
+            embed.add_field(name='Dependencies', value = '\t'.join(f"`{c}`" for c in info['dependencies']))
+            embed.add_field(name='Overlap', value = f"`{info['overlap']}`")
+            embed.add_field(name='Description', value = info['description'][:1024], inline=False)
+            if ctr == 0:
+                ctr = 1
+                await ctx.reply(embed=embed)
+            else:
+                await ctx.send(embed=embed)

@@ -23,7 +23,7 @@ async def on_member_join(member):
         embed = discord.Embed(
             description=f"{member.mention} {member.name}#{member.discriminator}",
             color=0x42B582,
-            timestamp=datetime.datetime.now()
+            timestamp=datetime.datetime.utcnow()
         )
         embed.set_author(name=f"Member Joined")
         embed.set_footer(text=f"ID: {member.id}")
@@ -40,7 +40,7 @@ async def on_member_remove(member):
         embed = discord.Embed(
             description=f"{member.mention} {member.name}#{member.discriminator}",
             color=0xFE4712,
-            timestamp=datetime.datetime.now()
+            timestamp=datetime.datetime.utcnow()
         )
         embed.set_author(name=f"Member Left")
         embed.set_footer(text=f"ID: {member.id}")
@@ -55,9 +55,9 @@ async def on_member_update(before, after):
                 editor = entry.user
             embed = discord.Embed(
                 color=0x3480D5,
-                timestamp=datetime.datetime.now()
+                timestamp=datetime.datetime.utcnow()
             )
-            embed.set_author(name=f"{before.name}#{before.discriminator}", icon_url=before.avatar)
+            embed.set_author(name=f"{before.name}#{before.discriminator}", icon_url=before.avatar_url)
             embed.set_footer(text=f"ID: {before.id}")
             if len(before.roles) < len(after.roles):
                 if editor == client.user:
@@ -72,11 +72,11 @@ async def on_member_update(before, after):
             embed = discord.Embed(
                 description=f"**{before.mention} nickname changed**",
                 color=0x3480D5,
-                timestamp=datetime.datetime.now()
+                timestamp=datetime.datetime.utcnow()
             )
             embed.add_field(name="Before", value=before.nick, inline=False)
             embed.add_field(name="After", value=after.nick, inline=False)
-            embed.set_author(name=f"{before.name}#{before.discriminator}", icon_url=before.avatar)
+            embed.set_author(name=f"{before.name}#{before.discriminator}", icon_url=before.avatar_url)
             embed.set_footer(text=f"ID: {before.id}")
             await channel.send(embed=embed)
 
@@ -93,9 +93,9 @@ async def on_message_delete(message):
         embed = discord.Embed( 
             description=f"**Message sent by {message.author.mention} deleted in {message.channel.mention}** \n {message.content}", 
             color=0xFE4712,
-            timestamp=datetime.datetime.now()
+            timestamp=datetime.datetime.utcnow()
         )
-        embed.set_author(name=f"{message.author.name}#{message.author.discriminator}", icon_url=message.author.avatar)
+        embed.set_author(name=f"{message.author.name}#{message.author.discriminator}", icon_url=message.author.avatar_url)
         embed.set_footer(text=f"Author: {message.author.id} | Message ID: {message.id}")
         await channel.send(embed=embed)
 
@@ -108,11 +108,11 @@ async def on_message_edit(before, after):
         embed = discord.Embed(
             description=f"**Message edited in {before.channel.mention}** [Jump to Message]({before.jump_url})",
             color=0x3480D5,
-            timestamp=datetime.datetime.now()
+            timestamp=datetime.datetime.utcnow()
         )
         embed.add_field(name="Before", value=before.content, inline=False)
         embed.add_field(name="After", value=after.content, inline=False)
-        embed.set_author(name=f"{before.author.name}#{before.author.discriminator}", icon_url=before.author.avatar)
+        embed.set_author(name=f"{before.author.name}#{before.author.discriminator}", icon_url=before.author.avatar_url)
         embed.set_footer(text=f"User ID: {before.author.id}")
         await channel.send(embed=embed)
 
@@ -170,7 +170,7 @@ async def edit(ctx, user: discord.Member, kerberos):
 @client.command()
 @commands.has_any_role(872326201132339210, 872381019553153077)
 async def update(ctx):
-    fname = f"logs/log-{datetime.datetime.now().isoformat()}.txt"
+    fname = f"logs/log-{datetime.datetime.utcnow().isoformat()}.txt"
     await kerberos_management.update(ctx, client, open(fname, "w"))
     log_channel = client.get_channel(1025769912645451908)
     await log_channel.send(file=discord.File(fname), content=ctx.author.mention)
@@ -201,6 +201,13 @@ async def slot(ctx, *args):
         return
     await course_management.send_slots(ctx, client, args)
 
+@client.command()
+async def info(ctx, *args):
+    discord_ids = json.load(open("datafiles/discord_ids.json", "r"))
+    if str(ctx.message.author.id) not in discord_ids:
+        await ctx.reply("Please set your kerberos using `?set <kerberos>` command before using this command!")
+        return
+    await course_management.send_info(ctx, client, args)
 
 # Mess Managers
 
@@ -266,9 +273,9 @@ async def updatetime(ctx, hostel, day, meal, *, time):
 async def avatar(ctx, user: discord.Member = None):
     if not user:
         user = ctx.author
-    embed = discord.Embed(title=f"Avatar", color=discord.Color.green(), timestamp=datetime.datetime.now())
-    embed.set_image(url=user.avatar)
-    embed.set_author(name=f"{user.name}#{user.discriminator}", icon_url=user.avatar)
+    embed = discord.Embed(title=f"Avatar", color=discord.Color.green(), timestamp=datetime.datetime.utcnow())
+    embed.set_image(url=user.avatar_url)
+    embed.set_author(name=f"{user.name}#{user.discriminator}", icon_url=user.avatar_url)
     embed.set_footer(text=f"Requested by {ctx.author.name}#{ctx.author.discriminator}")
     await ctx.reply(embed=embed)
 
@@ -285,8 +292,8 @@ async def ping(ctx):
 
 @client.command()
 async def help(ctx):
-    embed = discord.Embed(title="IITD-Bot Help Menu", color=0x1ABC9C, timestamp=datetime.datetime.now())
-    embed.set_thumbnail(url=client.user.avatar)
+    embed = discord.Embed(title="IITD-Bot Help Menu", color=0x1ABC9C, timestamp=datetime.datetime.utcnow())
+    embed.set_thumbnail(url=client.user.avatar_url)
     embed.add_field(name="General Commands", value="`?help` - Shows this message\n`?ping` - Shows bot latency\n`?set <kerberos>` - Sets your kerberos for using other commands\n`?courses` - Shows all the courses you are enrolled in\n`?timetable` - Shows your timetable\n`?slot <course_code>` - Shows all the slots of the given course code\n`?mess` - Shows the mess menu for your hostel for the present day", inline=False)
     embed.add_field(name="Manager Commands", value="`?updatemenu <hostel> <day> <meal> <menu>` - Updates the mess menu for the given hostel, day and meal\n`?updatetime <hostel> <day> <meal> <time>` - Updates the mess time for the given hostel, day and meal\n`?fetchldap` - Fetches course data from IITD Servers\n`?edit` - Set kerberos for another user\n`?purge <amount>` - Delete specified number of messages from a channel.\n`?update` - Updates the roles and names for everyone in the server.", inline=False)
     embed.add_field(name="Bot Details", value="Curious how this works? Check out the source code at https://github.com/as1605/IITD-Bot and leave a :star: if you like it!", inline=False)

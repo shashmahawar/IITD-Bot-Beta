@@ -1,7 +1,9 @@
-__pycache__
-.vscode
-env
+__pycache__/
+.vscode/
+env/
+
 .env
-datafiles
-logs
+
+datafiles/
+logs/
 olddata/

@@ -62,22 +62,22 @@ async def set(ctx, kerberos, client, msg, user):
         pass
     
     if method == 'UPDATE':
-        embed = discord.Embed(description=f"**{user.mention} kerberos updated.**", color=0x3480D5, timestamp=datetime.datetime.now())
+        embed = discord.Embed(description=f"**{user.mention} kerberos updated.**", color=0x3480D5, timestamp=datetime.datetime.utcnow())
         embed.add_field(name="Previous Kerberos", value=last_kerberos, inline=False)
         embed.add_field(name="New Kerberos", value=kerberos, inline=False)
-        embed.set_author(name=f"{user.name}#{user.discriminator}", icon_url=user.avatar)
+        embed.set_author(name=f"{user.name}#{user.discriminator}", icon_url=user.avatar_url)
         embed.set_footer(text=f"ID: {user.id}")
         await update_channel.send(embed=embed)
     else:
-        embed = discord.Embed(description=f"**{user.mention} kerberos set.**", color=0x3480D5, timestamp=datetime.datetime.now())
+        embed = discord.Embed(description=f"**{user.mention} kerberos set.**", color=0x3480D5, timestamp=datetime.datetime.utcnow())
         embed.add_field(name="Kerberos", value=kerberos, inline=False)
         embed.add_field(name="Name", value=user_name, inline=False)
-        embed.set_author(name=f"{user.name}#{user.discriminator}", icon_url=user.avatar)
+        embed.set_author(name=f"{user.name}#{user.discriminator}", icon_url=user.avatar_url)
         embed.set_footer(text=f"ID: {user.id}")
         await update_channel.send(embed=embed)
 
     if clash:
-        embed = discord.Embed(title="**Kerberos Clash**", description=f"Kerberos Clash has been identified between {user.mention} and {clashed_user.mention}.",color=0xFE4712, timestamp=datetime.datetime.now())
+        embed = discord.Embed(title="**Kerberos Clash**", description=f"Kerberos Clash has been identified between {user.mention} and {clashed_user.mention}.",color=0xFE4712, timestamp=datetime.datetime.utcnow())
         embed.add_field(name="Kerberos", value=kerberos, inline=True)
         embed.add_field(name="Name", value=user_name, inline=True)
         embed.set_footer(text=f"ID: {user.id}")
@@ -91,9 +91,9 @@ async def set(ctx, kerberos, client, msg, user):
     embed = discord.Embed(
         description=f"**{user.mention} was given the `{kerberos[:3].upper()}`, `{user_hostel}` and `20{kerberos[3:5]}` roles**",
         color=0x3480D5,
-        timestamp=datetime.datetime.now()
+        timestamp=datetime.datetime.utcnow()
     )
-    embed.set_author(name=f"{user.name}#{user.discriminator}", icon_url=user.avatar)
+    embed.set_author(name=f"{user.name}#{user.discriminator}", icon_url=user.avatar_url)
     embed.set_footer(text=f"ID: {user.id}")
     await member_channel.send(embed=embed)
 

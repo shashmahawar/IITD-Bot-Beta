@@ -6,6 +6,7 @@ kerberos = {}
 branches = []
 hostels = []
 course_slots = {}
+courseinfo = {}
 slots = []
 days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
 meals = ['breakfast', 'lunch', 'snacks', 'dinner']
@@ -44,6 +45,32 @@ def reload():
     slots = []
     with open("datafiles/slot_timings.json", "r") as f:
         slots = json.load(f)
+    
+    global courseinfo
+    courseinfo = {}
+    with open("datafiles/raw_course_data_2.xml") as cdata:
+        s = "".join(cdata.readlines())
+        tree = BeautifulSoup(s, 'html.parser')
+
+    # handling missing courses as well: 
+    mscidx = 0
+    for dep in tree.findAll("courses"):
+        for course in dep.findAll("course"):
+            ccode = getattr(course.find("code"), "string", None)
+            if not ccode:
+                ccode = f"MISS{mscidx}"
+                mscidx += 1
+
+            courseinfo[ccode] = {
+                "code": ccode,
+                "name": getattr(course.find("name"), "string", None),
+                "credits": getattr(course.find("credits"), "string", None),
+                "credit-structure": getattr(course.find("credit-structure"), "string", None),
+                "pre-requisites": getattr(course.find("pre-requisites"), "string", None),
+                "overlap": getattr(course.find("overlap"), "string", None),
+                "department": dep.get("department"),
+                "description": getattr(course.find("description"), "string", None)
+            }
 
 
 async def get_courses(kerberos):
@@ -57,7 +84,6 @@ async def get_courses(kerberos):
     return courses
 
 async def fetch_ldap(msg):
-
     url = "http://ldap1.iitd.ernet.in/LDAP/courses/gpaliases.html"
     response = requests.get(url)
 
@@ -92,9 +118,22 @@ async def fetch_ldap(msg):
     with open("datafiles/course_lists.json", "w") as outfile:
         json.dump(courseLists, outfile)
 
-    with open(f"datafiles/course_lists_{datetime.datetime.now().strftime('%d_%m_%Y')}.json", "w") as outfile:
+    with open(f"datafiles/course_lists_{datetime.datetime.utcnow().strftime('%d_%m_%Y')}.json", "w") as outfile:
         json.dump(courseLists, outfile)
 
     await msg.edit(content=f"Fetched LDAP!")
+
+def course_info(code):
+    code = code.upper()
+    if code not in courseinfo:
+        return None
+    course = courseinfo[code]
+    dependencies = []
+    for c in courseinfo:
+        if code in str(courseinfo[c]['pre-requisites']):
+            dependencies.append(c)
+    if dependencies == []: dependencies = [None]
+    course['dependencies'] = dependencies
+    return course
 
 reload()
