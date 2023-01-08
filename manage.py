@@ -115,7 +115,7 @@ async def on_message(message):
         return
     if await checkspam(message):
         return
-    client.process_commands(message)
+    await client.process_commands(message)
 
 @client.event
 async def on_message_delete(message):
