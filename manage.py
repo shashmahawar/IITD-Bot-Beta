@@ -8,9 +8,38 @@ intents = discord.Intents.all()
 client = commands.Bot(command_prefix='!', intents=intents, activity=discord.Activity(type=discord.ActivityType.listening, name="?help"), case_insensitive = True)
 client.remove_command('help')
 
+log = []
+
 @client.event
 async def on_ready():
     print('Bot Deployed!')
+
+async def checkspam(message):
+    if isinstance(message.channel, discord.channel.DMChannel):
+        return False
+    if discord.utils.get(message.guild.roles, id=958004057623126066) in message.author.roles:
+        return False
+    if message.content == "" or message.author.bot:
+        return False
+    log.append(message)
+    if len(log) > 25:
+        log.pop(0)
+    same = []
+    for l in log:
+        if l.author == message.author and l.content == message.content:
+            same.append(l)
+    if len(same) > 3:
+        for m in same:
+            try:
+                print(f"!ALERT!{message.guild}!{message.channel}!{message.author}!")
+                with open("spam.txt", "a") as messages:
+                    messages.write(f"{m}\n")
+                await m.reply("`[REDACTED]`")
+                await m.delete()
+            except:
+                print("[ERROR] couldn't delete")
+        return True
+    return False
 
 @client.event
 async def on_member_join(member):
@@ -79,6 +108,13 @@ async def on_member_update(before, after):
             embed.set_author(name=f"{before.name}#{before.discriminator}", icon_url=before.avatar_url)
             embed.set_footer(text=f"ID: {before.id}")
             await channel.send(embed=embed)
+
+@client.event
+async def on_message(message):
+    if message.author.bot:
+        return
+    if await checkspam(message):
+        return
 
 @client.event
 async def on_message_delete(message):
