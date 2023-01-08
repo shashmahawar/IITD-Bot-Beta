@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 import course_management, mess_management, moderation, kerberos_management, utils
 
 intents = discord.Intents.all()
-client = commands.Bot(command_prefix='!', intents=intents, activity=discord.Activity(type=discord.ActivityType.listening, name="?help"), case_insensitive = True)
+client = commands.Bot(command_prefix='?', intents=intents, activity=discord.Activity(type=discord.ActivityType.listening, name="?help"), case_insensitive = True)
 client.remove_command('help')
 
 log = []
@@ -115,6 +115,7 @@ async def on_message(message):
         return
     if await checkspam(message):
         return
+    client.process_commands(message)
 
 @client.event
 async def on_message_delete(message):
