@@ -25,7 +25,7 @@ async def send_menu(ctx, client, args):
                     if arg[1:4].lower() == d.lower():
                         days.append(d.title())
     if len(days) == 0:
-        days.append(calendar.day_abbr[datetime.datetime.now().weekday()])
+        days.append(calendar.day_abbr[(datetime.datetime.utcnow()+datetime.timedelta(hours=5.5)).weekday()])
     if len(hostels) == 0:
         kerberos = json.load(open("datafiles/discord_ids.json"))[str(ctx.message.author.id)]["kerberos"]
         hostel = utils.kerberos[kerberos]["hostel"]
