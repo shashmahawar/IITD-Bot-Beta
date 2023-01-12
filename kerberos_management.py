@@ -100,7 +100,7 @@ async def set(ctx, kerberos, client, msg, user):
 async def update(ctx, client, log):
     discord_ids = json.load(open("datafiles/discord_ids.json", 'r'))
     kerb_id = {}
-    channel = client.get_channel(1025773536989675571)
+    channel = client.get_channel(1063136411244564633)
     bot_commands = client.get_channel(872364635637035028)
 
     async for user in ctx.guild.fetch_members(limit=None):
