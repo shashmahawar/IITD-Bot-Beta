@@ -209,7 +209,7 @@ async def edit(ctx, user: discord.Member, kerberos):
 async def update(ctx):
     fname = f"logs/log-{datetime.datetime.utcnow().isoformat()}.txt"
     await kerberos_management.update(ctx, client, open(fname, "w"))
-    log_channel = client.get_channel(1025769912645451908)
+    log_channel = client.get_channel(1063136411244564633)
     await log_channel.send(file=discord.File(fname), content=ctx.author.mention)
 
 # Course Related Commands
