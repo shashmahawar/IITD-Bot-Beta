@@ -78,7 +78,7 @@ def reload():
             }
 
 
-async def get_courses(kerberos):
+def get_courses(kerberos):
     with open("datafiles/course_lists.json", "r") as f:
         course_lists = json.load(f)
     courses = []
