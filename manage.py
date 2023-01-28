@@ -246,6 +246,14 @@ async def info(ctx, *args):
         return
     await course_management.send_info(ctx, client, args)
 
+@client.command()
+async def minors(ctx, *args: typing.Union[discord.Member, str]):
+    discord_ids = json.load(open("discord_ids.json", "r"))
+    if str(ctx.message.author.id) not in discord_ids:
+        await ctx.reply("Please set your kerberos using `?set <kerberos>` command before using this command!")
+        return
+    await course_management.minors(ctx, client, args)
+
 # Mess Managers
 
 @client.command()

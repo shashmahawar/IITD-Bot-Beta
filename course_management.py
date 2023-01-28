@@ -98,3 +98,31 @@ async def send_info(ctx, client, args):
                 await ctx.reply(embed=embed)
             else:
                 await ctx.send(embed=embed)
+
+async def minors(ctx, client, args):
+    kerberos = []
+    if not args:
+        discord_ids = json.load(open("datafiles/discord_ids.json", "r"))
+        kerberos.append(discord_ids[str(ctx.author.id)]['kerberos'])
+    else:
+        for arg in args:
+            if type(arg) == discord.member.Member:
+                discord_ids = json.load(open("datafiles/discord_ids.json", "r"))
+                try:
+                    kerberos.append(discord_ids[str(arg.id)]['kerberos'])
+                except:
+                    pass
+            else:
+                kerberos.append(arg)
+    if len(kerberos) == 0:
+        return
+    ctr = 0
+    for user in kerberos:
+        embed = discord.Embed(title=f"Minor Schedule for {user}", color=discord.Color.green())
+        for minor in utils.get_minors(user):
+            embed.add_field(name=f"{minor['Day']} February", value=f"`{minor['Course']}`: **{minor['Time']}** ({'/'.join(minor['Venues'])})", inline=False)
+        if ctr == 0:
+            await ctx.reply(embed=embed)
+            ctr = 1
+        else:
+            await ctx.send(embed=embed)

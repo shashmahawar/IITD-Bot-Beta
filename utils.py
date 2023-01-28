@@ -52,6 +52,11 @@ def reload():
         s = "".join(cdata.readlines())
         tree = BeautifulSoup(s, 'html.parser')
 
+    global minors
+    minors = {}
+    with open("datafiles/minors.json", "r") as f:
+        minors = json.load(f)
+
     # handling missing courses as well: 
     mscidx = 0
     for dep in tree.findAll("courses"):
@@ -135,5 +140,17 @@ def course_info(code):
     if dependencies == []: dependencies = [None]
     course['dependencies'] = dependencies
     return course
+
+def get_minors(kerberos):
+    courses = get_courses(kerberos)
+    minor_list = []
+    for course in courses:
+        course = course.split('-')[1][:6]
+        if course in minors:
+            minor_details = minors[course]
+            minor_details['Course'] = course
+            minor_list.append(minor_details)
+    minor_list = sorted(minor_list, key=lambda x: (x['Day'], x['Time']))
+    return minor_list
 
 reload()
