@@ -145,7 +145,6 @@ def get_minors(kerberos):
     courses = get_courses(kerberos)
     minor_list = []
     for course in courses:
-        course = course.split('-')[1][:6]
         if course in minors:
             minor_details = minors[course]
             minor_details['Course'] = course

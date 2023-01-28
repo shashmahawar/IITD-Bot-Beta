@@ -20,7 +20,7 @@ async def send_timetable(ctx, client, args):
     ctr = 0
     for user in users:
         timetable = {"Monday": [], "Tuesday": [], "Wednesday": [], "Thursday": [], "Friday": []}
-        courses = await utils.get_courses(user)
+        courses = utils.get_courses(user)
         if not courses:
             return
         for course in courses:
@@ -56,7 +56,7 @@ async def send_courses(ctx, client, args):
                 users.append(arg)
     ctr = 0
     for user in users:
-        courses = await utils.get_courses(user)
+        courses = utils.get_courses(user)
         if not courses:
             return
         reply = ""
