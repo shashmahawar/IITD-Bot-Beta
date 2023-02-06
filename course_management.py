@@ -118,9 +118,10 @@ async def minors(ctx, client, args):
         return
     ctr = 0
     for user in kerberos:
-        embed = discord.Embed(title=f"Minor Schedule for {user}", color=discord.Color.green())
+        embed = discord.Embed(title=f"Minor Schedule for {user}", color=discord.Color.green(), timestamp=datetime.datetime.utcnow())
         for minor in utils.get_minors(user):
             embed.add_field(name=f"{minor['Day']} February", value=f"`{minor['Course']}`: **{minor['Time']}** ({'/'.join(minor['Venues'])})", inline=False)
+        embed.set_footer(text=f"Requested by: {ctx.author.name}#{ctx.author.discriminator}")
         if ctr == 0:
             await ctx.reply(embed=embed)
             ctr = 1
