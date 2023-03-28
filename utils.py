@@ -89,7 +89,7 @@ def get_courses(kerberos):
     return courses
 
 async def fetch_ldap(msg):
-    url = "http://ldap1.iitd.ernet.in/LDAP/courses/gpaliases.html"
+    url = "http://ldapweb.iitd.ac.in/LDAP/courses/gpaliases.html"
     response = requests.get(url)
 
     if response.status_code != 200:
@@ -104,7 +104,7 @@ async def fetch_ldap(msg):
 
     for course in courses:
         print(course)
-        url = f"http://ldap1.iitd.ernet.in/LDAP/courses/{course['href']}"
+        url = f"http://ldapweb.iitd.ac.in/LDAP/courses/{course['href']}"
         response = requests.get(url)
         if response.status_code != 200:
             continue
