@@ -115,6 +115,7 @@ async def on_message(message):
         return
     if message.author.id in [913467695310180362]:
         await message.reply("You have been banned from using this bot. If you think it's a mistake, please contact support.")
+        return
     if await checkspam(message):
         return
     await client.process_commands(message)
