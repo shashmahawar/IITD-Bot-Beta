@@ -21,6 +21,8 @@ async def checkspam(message):
         return False
     if message.content == "" or message.author.bot:
         return False
+    if message.author.id in [913467695310180362]:
+        await message.reply("You have been banned from using this bot. If you think it's a mistake, please contact support.")
     log.append(message)
     if len(log) > 25:
         log.pop(0)
