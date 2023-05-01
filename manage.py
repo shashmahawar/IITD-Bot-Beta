@@ -113,7 +113,7 @@ async def on_member_update(before, after):
 async def on_message(message):
     if message.author.bot:
         return
-    if message.author.id in [913467695310180362]:
+    if message.author.id in []:
         await message.reply("You have been banned from using this bot. If you think it's a mistake, please contact support.")
         return
     if await checkspam(message):
