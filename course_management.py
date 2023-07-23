@@ -78,6 +78,13 @@ async def send_slots(ctx, client, args):
     embed.set_footer(text=f"Requested by: {ctx.author.name}#{ctx.author.discriminator}")
     await ctx.reply(embed=embed)
 
+async def count(ctx, client, course):
+    count = utils.get_course_count(course)
+    if count:
+        await ctx.reply(f"`{course}` has {count} students.")
+    else:
+        await ctx.reply(f"`{course}` is not offered this semester [or] data not available.")
+
 async def send_info(ctx, client, args):
     ctr = 0
     for arg in args:

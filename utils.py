@@ -88,6 +88,14 @@ def get_courses(kerberos):
                 courses.append(course.split('-')[-1])
     return courses
 
+def get_course_count(code):
+    code = code.upper()
+    with open("datafiles/course_lists.json", "r") as f:
+        course_lists = json.load(f)
+    if code not in course_lists:
+        return 0
+    return len(course_lists[code])
+
 async def fetch_ldap(msg):
     url = "http://ldapweb.iitd.ac.in/LDAP/courses/gpaliases.html"
     response = requests.get(url)

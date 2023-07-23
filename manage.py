@@ -257,6 +257,14 @@ async def majors(ctx, *args: typing.Union[discord.Member, str]):
         return
     await course_management.majors(ctx, client, args)
 
+@client.command()
+async def count(ctx, course: str):
+    discord_ids = json.load(open("datafiles/discord_ids.json", "r"))
+    if str(ctx.message.author.id) not in discord_ids:
+        await ctx.reply("Please set your kerberos using `?set <kerberos>` command before using this command!")
+        return
+    await course_management.count(ctx, client, course)
+
 # Mess Managers
 
 @client.command()
