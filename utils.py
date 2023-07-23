@@ -89,7 +89,7 @@ def get_courses(kerberos):
     return courses
 
 def get_course_count(code):
-    code = code.upper()
+    code = "2301-" + code.upper()
     with open("datafiles/course_lists.json", "r") as f:
         course_lists = json.load(f)
     if code not in course_lists:
