@@ -81,7 +81,7 @@ async def send_slots(ctx, client, args):
 async def count(ctx, client, course):
     count = utils.get_course_count(course)
     if count:
-        await ctx.reply(f"`{course}` has {count} students.")
+        await ctx.reply(f"`{course}` has {count} participants. Number may include faculty and staff.")
     else:
         await ctx.reply(f"`{course}` is not offered this semester [or] data not available.")
 
