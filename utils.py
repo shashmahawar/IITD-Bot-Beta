@@ -84,12 +84,12 @@ def get_courses(kerberos):
     courses = []
     for course in course_lists:
         if kerberos in course_lists[course]:
-            if course.startswith('2301'):
+            if course.startswith('2302'):
                 courses.append(course.split('-')[-1])
     return courses
 
 def get_course_count(code):
-    code = "2301-" + code.upper()
+    code = "2302-" + code.upper()
     with open("datafiles/course_lists.json", "r") as f:
         course_lists = json.load(f)
     if code not in course_lists:
