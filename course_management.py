@@ -26,6 +26,7 @@ async def send_timetable(ctx, client, args):
         for course in courses:
             if course[2] != "L":
                 continue
+            course = course[:6]
             if course in utils.course_slots and utils.course_slots[course] in utils.slots:
                 slot = utils.course_slots[course]
                 slot_details = utils.slots[slot]
