@@ -98,7 +98,7 @@ def get_course_count(code):
 
 async def fetch_ldap(msg):
     url = "http://ldapweb.iitd.ac.in/LDAP/courses/gpaliases.html"
-    response = requests.get(url)
+    response = requests.get(url, verify=False)
 
     if response.status_code != 200:
         await msg.edit(content="Error: Could not fetch LDAP Data. Host not connected to network!")
@@ -113,7 +113,7 @@ async def fetch_ldap(msg):
     for course in courses:
         print(course)
         url = f"http://ldapweb.iitd.ac.in/LDAP/courses/{course['href']}"
-        response = requests.get(url)
+        response = requests.get(url, verify=False)
         if response.status_code != 200:
             continue
         soup = BeautifulSoup(response.text, 'html.parser')
