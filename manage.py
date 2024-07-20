@@ -223,6 +223,7 @@ async def timetable(ctx, *args: typing.Union[discord.Member, str]):
     if str(ctx.message.author.id) not in discord_ids:
         await ctx.reply("Please set your kerberos using `?set <kerberos>` command before using this command!")
         return
+    await ctx.reply("This command has been deprecated. For creating your timetable, use ClassGrid at https://classgrid.devclub.in.") ; return
     await course_management.send_timetable(ctx, client, args)
 
 @client.command()
@@ -231,6 +232,7 @@ async def courses(ctx, *args: typing.Union[discord.Member, str]):
     if str(ctx.message.author.id) not in discord_ids:
         await ctx.reply("Please set your kerberos using `?set <kerberos>` command before using this command!")
         return
+    await ctx.reply("This command has been deprecated. For creating your timetable, use ClassGrid at https://classgrid.devclub.in.") ; return
     await course_management.send_courses(ctx, client, args)
 
 @client.command()
@@ -239,6 +241,7 @@ async def slot(ctx, *args):
     if str(ctx.message.author.id) not in discord_ids:
         await ctx.reply("Please set your kerberos using `?set <kerberos>` command before using this command!")
         return
+    await ctx.reply("This command has been deprecated.") ; return
     await course_management.send_slots(ctx, client, args)
 
 @client.command()
@@ -249,12 +252,13 @@ async def info(ctx, *args):
         return
     await course_management.send_info(ctx, client, args)
 
-@client.command(aliases=['major'])
+@client.command(aliases=['major', 'minors', 'minor'])
 async def majors(ctx, *args: typing.Union[discord.Member, str]):
     discord_ids = json.load(open("datafiles/discord_ids.json", "r"))
     if str(ctx.message.author.id) not in discord_ids:
         await ctx.reply("Please set your kerberos using `?set <kerberos>` command before using this command!")
         return
+    await ctx.reply("This command has been deprecated. For checking your examination schedule, please visit https://exam.iitd.ac.in (accessible via IITD intranet only)") ; return
     await course_management.majors(ctx, client, args)
 
 @client.command()
@@ -263,6 +267,7 @@ async def count(ctx, course: str):
     if str(ctx.message.author.id) not in discord_ids:
         await ctx.reply("Please set your kerberos using `?set <kerberos>` command before using this command!")
         return
+    await ctx.reply("This command has been deprecated.") ; return
     await course_management.count(ctx, client, course)
 
 # Mess Managers
